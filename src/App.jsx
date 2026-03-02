@@ -26,7 +26,7 @@ const App = () => {
   }
 
   return (
-    <div className="bg-black min:h-screen w-full lg:flex">
+    <div className="bg-black min-h-screen  w-full lg:flex">
       <div className=" w-full lg:border-r-2 border-white">
         <form
           className="flex flex-col gap-4  pt-20 px-20 text-white "
@@ -70,8 +70,8 @@ const App = () => {
             style={{ backgroundImage: `url(${BG})` }}
           >
             <div>
-              <h1 className="text-black font-bold text-2xl tracking-tighter uppercase">{elem.title}</h1>
-              <p className="h-30 tracking-tight text-sm text-gray-600 pt-3 leading-4.5 overflow-scroll" style={{ scrollbarWidth: "none" }}>{elem.task}</p>
+              <h1 className="text-black font-bold text-xl tracking-tighter uppercase overflow-scroll whitespace-nowrap" style={{ scrollbarWidth: "none" }}>{elem.title}</h1>
+              <p className="h-30 tracking-tight text-sm text-gray-600 pt-4 leading-4.5 overflow-scroll" style={{ scrollbarWidth: "none" }}>{elem.task}</p>
             </div>
             <button className="bg-red-500 rounded text-white text-sm py-0.5 cursor-pointer" onClick={()=>deleteTask(idx)}>Delete</button>
           </div>
