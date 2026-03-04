@@ -1,80 +1,109 @@
-import React, { useState } from "react";
-import BG from './assets/notes-background.jpg'
+import React, { useState, useEffect } from "react";
+import BG from "./assets/notes-background.jpg";
 
 const App = () => {
-  const [tasks , setTasks] = useState([])
+  const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
   const [task, setTask] = useState("");
 
+  // Load tasks from localStorage on first render
+  useEffect(() => {
+    const savedTasks = JSON.parse(localStorage.getItem("tasks"));
+    if (savedTasks) {
+      setTasks(savedTasks);
+    }
+  }, []);
+
+  // Save tasks to localStorage whenever tasks change
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
+
   const onSubmitHandle = (e) => {
     e.preventDefault();
-    
-    const copyTasks = [...tasks]
 
-    copyTasks.push({title,task})
-    setTasks(copyTasks)
+    // Prevent empty submission
+    if (!title.trim() || !task.trim()) return;
+
+    const newTask = {
+      id: Date.now(),
+      title: title.trim(),
+      task: task.trim(),
+    };
+
+    // Functional update (best practice)
+    setTasks((prev) => [...prev, newTask]);
 
     setTitle("");
     setTask("");
   };
-  const deleteTask = (idx) => {
-    // console.log(idx);
-    
-    const copyTasks = [...tasks]
-    copyTasks.splice(idx,1)
-    setTasks(copyTasks);
-  }
+
+  const deleteTask = (id) => {
+    setTasks((prev) => prev.filter((elem) => elem.id !== id));
+  };
 
   return (
-    <div className="bg-black min-h-screen  w-full lg:flex">
-      <div className=" w-full lg:border-r-2 border-white">
+    <div className="bg-black min-h-screen w-full lg:flex">
+      {/* Form Section */}
+      <div className="w-full lg:border-r-2 border-white">
         <form
-          className="flex flex-col gap-4  pt-20 px-20 text-white "
-          onSubmit={(e) => {
-            onSubmitHandle(e);
-          }}
+          className="flex flex-col gap-4 pt-20 px-20 text-white"
+          onSubmit={onSubmitHandle}
         >
-          <h1 className="text-white text-4xl font-bold  ">Add task</h1>
+          <h1 className="text-4xl font-bold">Add Task</h1>
+
           <input
             type="text"
-            placeholder="enter heading"
-            className="border py-2 px-3 rounded text-xl"
+            placeholder="Enter heading"
+            className="border py-2 px-3 rounded text-xl text-black"
             value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-            }}
+            onChange={(e) => setTitle(e.target.value)}
           />
+
           <textarea
-            type="text"
-            placeholder="enter task"
-            className="h-32 border py-2 px-3 rounded text-xl resize-none"
+            placeholder="Enter task"
+            className="h-32 border py-2 px-3 rounded text-xl resize-none text-black"
             value={task}
-            onChange={(e) => {
-              setTask(e.target.value);
-            }}
+            onChange={(e) => setTask(e.target.value)}
           />
+
           <button
             type="submit"
-            className="bg-white px-3 py-2 rounded cursor-pointer active:scale-98 text-black font-bold tracking-wide"
+            className="bg-white px-3 py-2 rounded cursor-pointer active:scale-95 text-black font-bold tracking-wide"
           >
-            Add task
+            Add Task
           </button>
         </form>
       </div>
-      <div className=" w-full px-10 py-20 overflow-auto">
-        <h1 className="text-white text-4xl font-bold  ">Recent task</h1>
-        <div className=" flex gap-4 flex-wrap mt-6">
-          {tasks.map((elem,idx) =>(
-            <div key={idx}
-           className="bg-cover h-50 w-40 rounded-xl flex flex-col justify-between px-3 py-1 pt-2"
-            style={{ backgroundImage: `url(${BG})` }}
-          >
-            <div>
-              <h1 className="text-black font-bold text-xl tracking-tighter uppercase overflow-scroll whitespace-nowrap" style={{ scrollbarWidth: "none" }}>{elem.title}</h1>
-              <p className="h-30 tracking-tight text-sm text-gray-600 pt-4 leading-4.5 overflow-scroll" style={{ scrollbarWidth: "none" }}>{elem.task}</p>
+
+      {/* Tasks Section */}
+      <div className="w-full px-10 py-20 overflow-auto">
+        <h1 className="text-white text-4xl font-bold">Recent Tasks</h1>
+
+        <div className="flex gap-4 flex-wrap mt-6">
+          {tasks.map((elem) => (
+            <div
+              key={elem.id}
+              className="bg-cover h-52 w-44 rounded-xl flex flex-col justify-between px-3 py-2 shadow-lg"
+              style={{ backgroundImage: `url(${BG})` }}
+            >
+              <div>
+                <h1 className="text-black font-bold text-lg uppercase truncate">
+                  {elem.title}
+                </h1>
+
+                <p className="text-sm text-gray-700 mt-3 line-clamp-4">
+                  {elem.task}
+                </p>
+              </div>
+
+              <button
+                className="bg-red-500 rounded text-white text-sm py-1 cursor-pointer hover:bg-red-600 transition"
+                onClick={() => deleteTask(elem.id)}
+              >
+                Delete
+              </button>
             </div>
-            <button className="bg-red-500 rounded text-white text-sm py-0.5 cursor-pointer" onClick={()=>deleteTask(idx)}>Delete</button>
-          </div>
           ))}
         </div>
       </div>
